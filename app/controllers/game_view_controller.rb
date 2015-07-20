@@ -6,8 +6,9 @@ class GameViewController < UIViewController
   def skView
     @skView ||= SKView.new.tap do |view|
       view.showsFPS = true
-      view.showsNodeCount = true
+      view.showsQuadCount = true
       view.showsDrawCount = true
+      view.showsNodeCount = true
       view.showsPhysics = true
       view.showsFields = true
     end

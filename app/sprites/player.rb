@@ -7,11 +7,9 @@ class Player < SKSpriteNode
     self.position = CGPointMake(80, 400)
     self.scale = 2.5
     self.name = 'player'
-    self.runAction run
     self
   end
 
-  #['idle', 'jump', 'run'].each do |action|
   ['run'].each do |action|
     define_method(action) do
       animations = [].tap do |array|

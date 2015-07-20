@@ -6,6 +6,7 @@ class MainScene < SKScene
   def didMoveToView(view)
     super
 
+    @game_state = :started
     physicsWorld.gravity = CGVectorMake(0.0, -5.0)
     physicsWorld.contactDelegate = self
 
@@ -17,7 +18,6 @@ class MainScene < SKScene
     add_player
 
     addChild pauseLabel
-    addChild obstacleLabel
     # begin_spawning_pipes
   end
 
@@ -62,9 +62,9 @@ class MainScene < SKScene
 
     2.times do |i|
       ground = SKSpriteNode.spriteNodeWithTexture(texture)
-      # ground.position = CGPointMake(width + (i * width * 2), 56)
+      ground.name = 'ground'
       ground.position = CGPointMake(width + (i * width * 2), 74)
-      ground.runAction scroll_action(width, 0.02)
+      # ground.runAction scroll_action(width, 0.02)
       ground.zPosition = 2
 
       addChild ground
@@ -110,6 +110,7 @@ class MainScene < SKScene
 
   def touchesBegan(touches, withEvent: event)
     puts 'touchesBegan'
+    puts @game_state
 
     touch = touches.anyObject
     location = touch.locationInNode(self)
@@ -125,7 +126,17 @@ class MainScene < SKScene
     elsif node.name == 'player'
       player_jump(30)
     else
-      player_jump
+      if @game_state == :running
+        player_jump
+      else
+        @game_state = :running
+        player = childNodeWithName('player')
+        player.runAction(player.run)
+        width = mid_x + 7
+        self.enumerateChildNodesWithName "ground", usingBlock: -> (node, stop) {
+          node.runAction scroll_action(width, 0.02)
+        }
+      end
     end
   end
 
