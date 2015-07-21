@@ -13,7 +13,7 @@ class PipePair < SKNode
 
   def top
     pipe_up = Pipe.alloc.init('platform.png')
-    pipe_up.position = CGPointMake(0, max_x - random_y)
+    pipe_up.position = CGPointMake(0, random_y)
     pipe_up
   end
 
@@ -24,15 +24,11 @@ class PipePair < SKNode
   # end
 
   def random_y
-    @y ||= Random.new.rand (min_y + 150)..(max_y - 150)
+    Random.new.rand((0.0)..(max_y))
   end
 
-  def min_y
-    CGRectGetMinY(self.frame)
-  end
-
-  def max_x
-    CGRectGetMaxX(self.frame)
+  def max_y
+    Device.screen.height
   end
 
   def move_and_remove

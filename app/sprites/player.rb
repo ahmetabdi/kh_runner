@@ -44,6 +44,7 @@ class Player < SKSpriteNode
       body.categoryBitMask = PLAYER
       body.contactTestBitMask = MainScene::WORLD
       body.usesPreciseCollisionDetection = true
+      body.allowsRotation = false # Default: true
     end
   end
 end
