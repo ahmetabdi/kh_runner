@@ -1,7 +1,7 @@
 class MainScene < SKScene
   WORLD = 0x1 << 1
   SUPER_JUMPS = 3
-  PLAYER_DEFAULT_JUMP_HEIGHT = 15
+  PLAYER_DEFAULT_JUMP_HEIGHT = 50
 
   def didMoveToView(view)
     super
@@ -18,7 +18,7 @@ class MainScene < SKScene
     add_player
 
     addChild pauseLabel
-    # begin_spawning_pipes
+    begin_spawning_pipes
   end
 
   def pauseLabel

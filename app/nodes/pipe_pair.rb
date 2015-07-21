@@ -5,26 +5,34 @@ class PipePair < SKNode
     self.position = CGPointMake(400, 0)
     self.zPosition = -10
     self.name = 'pipes'
-    # self.addChild(top)
-    self.addChild(bottom)
+    self.addChild(top)
+    # self.addChild(bottom)
     self.runAction(move_and_remove)
     self
   end
 
-  # def top
-  #   pipe_up = Pipe.alloc.init('pipe_down.png')
-  #   pipe_up.position = CGPointMake(0, random_y + 450)
-  #   pipe_up
-  # end
-
-  def bottom
-    pipe_down = Pipe.alloc.init('pipe_up.png')
-    pipe_down.position = CGPointMake(0, random_y)
-    pipe_down
+  def top
+    pipe_up = Pipe.alloc.init('platform.png')
+    pipe_up.position = CGPointMake(0, max_x - random_y)
+    pipe_up
   end
 
+  # def bottom
+  #   pipe_down = Pipe.alloc.init('platform.png')
+  #   pipe_down.position = CGPointMake(0, random_y)
+  #   pipe_down
+  # end
+
   def random_y
-    @y ||= Random.new.rand 0.0..(50.0)
+    @y ||= Random.new.rand (min_y + 150)..(max_y - 150)
+  end
+
+  def min_y
+    CGRectGetMinY(self.frame)
+  end
+
+  def max_x
+    CGRectGetMaxX(self.frame)
   end
 
   def move_and_remove

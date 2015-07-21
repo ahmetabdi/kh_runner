@@ -2,27 +2,39 @@ class Player < SKSpriteNode
   PLAYER = 0x1 << 0
 
   def init
-    self.initWithImageNamed("bird_one.png")
+    self.initWithImageNamed("sora/run_0.png")
     self.physicsBody = physics_body
     self.position = CGPointMake(80, 400)
-    self.scale = 2.5
+    self.scale = 1.25
     self.name = 'player'
+    self.runAction attack_1
     self
   end
 
-  ['run'].each do |action|
+  ['run', 'intro', 'attack_1', 'attack_2', 'attack_3'].each do |action|
     define_method(action) do
       animations = [].tap do |array|
-        8.times do |i|
-          array << SKTexture.textureWithImageNamed("sora/#{action}_#{i + 1}.png")
+        frame_lookup(action).times do |i|
+          array << SKTexture.textureWithImageNamed("sora/#{action}_#{i}.png")
         end
       end
       animation = SKAction.animateWithTextures(animations, timePerFrame: 0.10)
-      if action == 'run'
+      # if action == 'run' || action == 'attack_1'
         SKAction.repeatActionForever(animation)
-      else
-        SKAction.repeatAction(animation, count: 1)
-      end
+      # else
+        # SKAction.repeatAction(animation, count: 1)
+      # end
+    end
+  end
+
+  def frame_lookup(action)
+    case action
+    when 'run' then 8
+    when 'intro' then 17
+    when 'attack_1' then 4
+    when 'attack_2'then 5
+    when 'attack_3' then 7
+    else raise "Unknown frame_lookup for action: #{action}"
     end
   end
 
