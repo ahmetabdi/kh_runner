@@ -7,6 +7,8 @@ class MainScene < SKScene
     super
 
     @game_state = :started
+
+    # Add gravity
     physicsWorld.gravity = CGVectorMake(0.0, -5.0)
     physicsWorld.contactDelegate = self
 
@@ -15,10 +17,15 @@ class MainScene < SKScene
     # addChild GameBounds.alloc.init
 
     add_ground
-    add_player
+    create_player
 
     addChild pauseLabel
     begin_spawning_pipes
+  end
+
+
+  def create_player
+    addChild Player.alloc.init
   end
 
   def pauseLabel
@@ -64,17 +71,13 @@ class MainScene < SKScene
       ground = SKSpriteNode.spriteNodeWithTexture(texture)
       ground.name = 'ground'
       ground.position = CGPointMake(width + (i * width * 2), 74)
-      # ground.runAction scroll_action(width, 0.02)
+      ground.runAction scroll_action(width, 0.02)
       ground.zPosition = 2
 
       addChild ground
     end
 
     addChild PhysicalGround.alloc.init
-  end
-
-  def add_player
-    addChild Player.alloc.init
   end
 
   def begin_spawning_pipes
@@ -102,11 +105,8 @@ class MainScene < SKScene
     @delta = @last_update_time ?  current_time - @last_update_time : 0
     @last_update_time = current_time
 
-    # check_controller
     move_background
-    # rotate_player
   end
-
 
   def touchesBegan(touches, withEvent: event)
     puts 'touchesBegan'
@@ -124,13 +124,14 @@ class MainScene < SKScene
         self.paused = true
       end
     elsif node.name == 'player'
-      player_jump(30)
+      attack_animations = [player.attack_1, player.attack_2, player.attack_3]
+      player.runAction(attack_animations.sample)
     else
       if @game_state == :running
+        player.physicsBody.dynamic = true
         player_jump
       else
         @game_state = :running
-        player = childNodeWithName('player')
         player.runAction(player.run)
         width = mid_x + 7
         self.enumerateChildNodesWithName "ground", usingBlock: -> (node, stop) {
@@ -141,7 +142,6 @@ class MainScene < SKScene
   end
 
   def player_jump(impulse = 0)
-    player = childNodeWithName('player')
     # return if player.position.y > 130
 
     # player.runAction(player.jump)
@@ -149,38 +149,30 @@ class MainScene < SKScene
     player.physicsBody.applyImpulse CGVectorMake(0, PLAYER_DEFAULT_JUMP_HEIGHT + impulse)
   end
 
-  def rotate_player
-    node = childNodeWithName('player')
-    dy = node.physicsBody.velocity.dy
-    node.zRotation = max_rotate(dy * (dy < 0 ? 0.003 : 0.001))
-  end
-
-  def max_rotate(value)
-    if value > 0.7
-      0.7
-    elsif value < -0.3
-      -0.3
-    else
-      value
-    end
-  end
-
   def didBeginContact(contact)
-    if contact.bodyA.categoryBitMask < contact.bodyB.categoryBitMask
-      player = contact.bodyA
-      if player.categoryBitMask == Player::PLAYER
-        puts "Tocuhing the pipe #{player} #{player.node}"
-        # player.node.zRotation = 0
-        # player.node.position = CGPointMake(80, CGRectGetMidY(self.frame))
-        # enumerateChildNodesWithName 'pipes', usingBlock:-> (node, stop) { node.removeFromParent }
-      end
-    else
-      puts 'Touching the ground'
-      player = contact.bodyB
-    end
+    other = (contact.bodyA.node != player) ? contact.bodyA.node : contact.bodyB.node;
+    other.collisionWithPlayer(player)
+    # if contact.bodyA.categoryBitMask < contact.bodyB.categoryBitMask
+    #   player = contact.bodyA
+    #   if player.categoryBitMask == Player::PLAYER
+    #     puts "Tocuhing the pipe #{player} #{player.node}"
+    #     # player.node.zRotation = 0
+    #     # player.node.position = CGPointMake(80, CGRectGetMidY(self.frame))
+    #     # enumerateChildNodesWithName 'pipes', usingBlock:-> (node, stop) { node.removeFromParent }
+    #   end
+    # else
+    #   puts 'Touching the ground'
+    #   player = contact.bodyB
+    # end
 
-    puts contact.bodyA
-    puts contact.bodyB
+    # puts contact.bodyA
+    # puts contact.bodyB
+  end
+
+  private
+
+  def player
+    @player ||= childNodeWithName('player')
   end
 
   def min_x

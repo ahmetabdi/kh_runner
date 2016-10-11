@@ -7,7 +7,7 @@ class Player < SKSpriteNode
     self.position = CGPointMake(80, 400)
     self.scale = 1.25
     self.name = 'player'
-    self.runAction attack_1
+    self.runAction run
     self
   end
 
@@ -19,11 +19,11 @@ class Player < SKSpriteNode
         end
       end
       animation = SKAction.animateWithTextures(animations, timePerFrame: 0.10)
-      # if action == 'run' || action == 'attack_1'
+      if action == 'run'
         SKAction.repeatActionForever(animation)
-      # else
-        # SKAction.repeatAction(animation, count: 1)
-      # end
+      else
+        SKAction.repeatAction(animation, count: 1)
+      end
     end
   end
 
@@ -39,12 +39,17 @@ class Player < SKSpriteNode
   end
 
   def physics_body
-    @physics_body ||= SKPhysicsBody.bodyWithRectangleOfSize(size).tap do |body|
+    @physics_body ||= SKPhysicsBody.bodyWithRectangleOfSize([size.width / 2, size.height]).tap do |body|
       body.friction = 0.0
+      body.angularDamping = 0.0
+      body.linearDamping = 0.0
+      # body.restitution = 1.0
       body.categoryBitMask = PLAYER
       body.contactTestBitMask = MainScene::WORLD
       body.usesPreciseCollisionDetection = true
+      # body.collisionBitMask = 0 # Simulate any collisions ourself
       body.allowsRotation = false # Default: true
+      body.dynamic = true
     end
   end
 end
